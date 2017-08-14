@@ -4,6 +4,7 @@ from .models import Coin
 from .tables import BootstrapTable
 from django_tables2 import RequestConfig
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
+
 def index(request):
     table = BootstrapTable(Coin.objects.all())
     RequestConfig(request).configure(table)
@@ -22,5 +23,8 @@ def sync_up(request):
     coin_to_url = get_all_coins()
     for coin in coin_to_url:
         url = coin_to_url[coin]
-        get_historical_data_for_url(url)
+        if not Coin.objects.filter(coin_name=coin).exists():
+            c = Coin(coin_name=coin,sector='',tech='',star=0,investment_memo='')
+            c.save()
+        get_historical_data_for_url(url,Coin.objects.get(coin_name=coin).get_id())
     return index(request)
