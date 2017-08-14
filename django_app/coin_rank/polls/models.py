@@ -5,7 +5,6 @@ class Coin(models.Model):
     def __str__(self):
         return self.coin_name + " " + self.coin_symbol
     coin_name = models.CharField(max_length=1024)
-    coin_symbol = models.CharField(max_length=1024)
     sector = models.CharField(max_length=1024)
     tech = models.CharField(max_length=1024)
     star = models.IntegerField(default=-1)
