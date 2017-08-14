@@ -6,6 +6,12 @@ class Coin(models.Model):
         return self.coin_name + " "
     def get_id(self):
         return self.id
+    def get_rank_at(self,timestamp):
+        try:
+            r = Rank.objects.get(daily_timestamp=timestamp, coin_id=self)
+            return r.rank
+        except:
+            return -1
     coin_name = models.CharField(max_length=1024)
     sector = models.CharField(max_length=1024)
     tech = models.CharField(max_length=1024)
