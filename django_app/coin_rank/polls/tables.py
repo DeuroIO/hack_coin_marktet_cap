@@ -7,4 +7,5 @@ class BootstrapTable(tables.Table):
         model = Coin
         template = 'django_tables2/bootstrap.html'
         attrs = {'class': 'table table-bordered table-striped table-hover'}
-        exclude = ('friendly', )
+        exclude = ('id','investment_memo','created_at','updated_at')
+        sequence = ('Link', 'coin_name', 'sector','tech','star')

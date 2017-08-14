@@ -4,9 +4,10 @@ import sys
 from re import sub
 from decimal import Decimal
 import datetime
-from .models import Historical,Coin
+from .models import Historical,Coin, TimeStamp
 from numpy import mean
 import re
+import pytz
 
 if sys.version_info[0] == 3:
     from urllib.request import urlopen
@@ -73,7 +74,8 @@ def get_historical_data_for_url(url,coin_id):
                 if counts == 0:
                     # timestamp
                     timestamp = datetime.datetime.strptime(td.text, "%b %d, %Y")
-                    values.append(timestamp)
+                    datetime_in_utc = timestamp.astimezone(pytz.utc)
+                    values.append(datetime_in_utc)
                 elif td.text == "-":
                     values.append(0.0)
                 elif "," in td.text:
@@ -82,14 +84,20 @@ def get_historical_data_for_url(url,coin_id):
                 else:
                     values.append(float(td.text))
                 counts += 1
+        if not TimeStamp.objects.filter(daily_timestamp=values[0]).exists():
+            t = TimeStamp(daily_timestamp=values[0])
+            t.save()
 
-        if not Historical.objects.filter(coin_id=coin_id).filter(daily_timestamp=values[0]).exists():
+        t = TimeStamp.objects.get(daily_timestamp=values[0])
+        if not Historical.objects.filter(coin_id=coin_id).filter(daily_timestamp=t).exists():
             coin_average_price = mean(values[1:5])
             circulating_cap = values[-1]
             if total_supply != 0:
                 circulating_cap = coin_average_price * total_supply
             coin_obj = Coin.objects.get(id=coin_id)
-            h = Historical(coin_id=coin_obj, daily_timestamp=values[0], average_price=coin_average_price,
+            h = Historical(coin_id=coin_obj, daily_timestamp=t, average_price=coin_average_price,
                                volume=values[-2], circulating_cap=values[-1],
                                total_cap=circulating_cap)
             h.save()
+
+
