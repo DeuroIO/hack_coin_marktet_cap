@@ -125,3 +125,10 @@ table.paleblue > tbody > tr > td > span.false {
 div.table-container {
     display: inline-block;
 }
+
+td.red {
+    color: red;
+}
+td.green {
+    color: green;
+}

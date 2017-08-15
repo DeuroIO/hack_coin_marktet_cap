@@ -4,6 +4,7 @@ from .models import Coin,TimeStamp,Historical,Rank,Price_Change
 # from .tables import BootstrapTable
 # from django_tables2 import RequestConfig
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
+from .helper import beatifiy_a_number
 
 def index(request):
     # table = BootstrapTable(Coin.objects.all())
@@ -14,14 +15,14 @@ def index(request):
         timestamp = TimeStamp.objects.latest('daily_timestamp')
     for coin in coins:
         h = Historical.objects.get(coin_id=coin,daily_timestamp=timestamp)
-        coin.average_price = h.average_price
-        coin.volume = h.volume
-        coin.total_cap = h.total_cap
-        coin.circulating_cap = h.circulating_cap
+        coin.average_price = "${0:.3f}".format(h.average_price)
+        coin.volume = beatifiy_a_number(h.volume)
+        coin.total_cap = "$" + str(beatifiy_a_number(h.total_cap))
+        coin.circulating_cap = "$" + str(beatifiy_a_number(h.circulating_cap))
         r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
         coin.rank = r.rank
         p = Price_Change.objects.get(coin_id=coin,daily_timestamp=timestamp)
-        coin.price_change = "{0:.2f}%".format(p.price_change)
+        coin.price_change = round(p.price_change, 2)
     coins = sorted(coins, key=lambda x: x.rank)
 
     return render(request,'index.html',{'coins':coins})

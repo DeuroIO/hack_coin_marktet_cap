@@ -9,6 +9,7 @@
     <link href="{% static 'django_tables2/bootstrap.css' %}" rel="stylesheet" />
     <link href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <link href="{% static 'css/screen.css' %}" rel="stylesheet"/>
 </head>
 <body>
 <div class="container">
@@ -37,11 +38,11 @@
                 <tr>
                     <th>Rank</th>
                     <th>Name</th>
-                    <th>circulating_cap</th>
-                    <th>total_cap</th>
-                    <th>average_price</th>
+                    <th>Circulating Cap</th>
+                    <th>Total Cap</th>
+                    <th>Average Price</th>
                     <th>Volume</th>
-                    <th>Price_Change</th>
+                    <th>Price Change</th>
                 </tr>
                 </thead>
                 {% for c in coins %}
@@ -53,9 +54,9 @@
                     <td>{{ c.total_cap }}</td>
                     <td>{{ c.average_price }}</td>
                     <td>{{ c.volume }}</td>
-
-
-                    <td>{{ c.price_change }}</td>
+                    <td class="
+    {% if c.price_change >= 0.0 %}green{% endif %}
+    {% if c.price_change < 0.0 %}red{% endif %}">{{ c.price_change }}%</td>
                 </tr>
                  </tbody>
                 {% endfor %}
