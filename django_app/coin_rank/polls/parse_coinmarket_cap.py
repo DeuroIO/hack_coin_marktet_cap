@@ -76,8 +76,7 @@ def get_historical_data_for_url(url,coin_obj):
                 if counts == 0:
                     # timestamp
                     timestamp = datetime.datetime.strptime(td.text, "%b %d, %Y")
-                    datetime_in_utc = timestamp.astimezone(pytz.utc)
-                    values.append(datetime_in_utc)
+                    values.append(timestamp)
                 elif td.text == "-":
                     values.append(0.0)
                 elif "," in td.text:
