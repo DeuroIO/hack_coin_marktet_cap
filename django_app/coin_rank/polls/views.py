@@ -3,6 +3,8 @@ from .models import Coin,TimeStamp,Historical,Rank,Price_Change
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
 from .helper import beatifiy_a_number
 import json
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 def index(request):
     slider_timestamps = TimeStamp.objects.all()
