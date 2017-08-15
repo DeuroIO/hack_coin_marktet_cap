@@ -17,7 +17,7 @@ class RankAdmin(admin.ModelAdmin):
     search_fields = ['coin_id__coin_name','daily_timestamp__daily_timestamp']
 
 class TimeStampAdmin(admin.ModelAdmin):
-    list_display = ('daily_timestamp','created_at','updated_at')
+    list_display = ('id','daily_timestamp','created_at','updated_at')
     search_fields = ['daily_timestamp',]
 
 class Price_ChangeStampAdmin(admin.ModelAdmin):

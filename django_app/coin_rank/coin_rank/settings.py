@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['165.227.31.153', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'bootstrap3',
-    'django_tables2',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',

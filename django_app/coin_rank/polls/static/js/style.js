@@ -234,7 +234,5 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
         createMaster();
     });
 });
-$(document).ready(function()
-{
-  $("tr:even").css("background-color", "#FFFFFF");
-});
+
+

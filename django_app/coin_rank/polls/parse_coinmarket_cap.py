@@ -40,7 +40,7 @@ def get_all_coins():
         coin_to_url[name] = link
     return coin_to_url
 
-def get_historical_data_for_url(url,coin_id):
+def get_historical_data_for_url(url,coin_obj):
     now = datetime.datetime.now()
     url = url + str(now.year)
     if now.month < 10:
@@ -55,12 +55,14 @@ def get_historical_data_for_url(url,coin_id):
     soup = get_html_by_url(url)
 
     #Try to calculate total_supply
-    divs = soup.findAll('div',{'class':'coin-summary-item col-xs-6  col-md-3 '})
+    h3s = soup.findAll('h3')
+
     total_supply = 0
-    for div in divs:
-        title = div.findAll('h3')[0].text.lower()
+    for h3 in h3s:
+        title = h3.text.lower()
         if 'supply' in title and title != 'circulating supply':
-            total_supply = div.findAll('coin-summary-item-detail')[0].text
+            div_parent = h3.parent.parent
+            total_supply = div_parent.findAll('div',{"class":"coin-summary-item-detail"})[0].text
             total_supply = float(re.sub("[^0-9]", "", total_supply))
             break
 
@@ -89,15 +91,18 @@ def get_historical_data_for_url(url,coin_id):
             t.save()
 
         t = TimeStamp.objects.get(daily_timestamp=values[0])
-        if not Historical.objects.filter(coin_id=coin_id).filter(daily_timestamp=t).exists():
-            coin_average_price = mean(values[1:5])
-            circulating_cap = values[-1]
-            if total_supply != 0:
-                circulating_cap = coin_average_price * total_supply
-            coin_obj = Coin.objects.get(id=coin_id)
+        coin_average_price = mean(values[1:5])
+        total_cap = values[-1]
+        if total_supply != 0:
+            total_cap = coin_average_price * total_supply
+        if not Historical.objects.all().filter(coin_id=coin_obj).filter(daily_timestamp=t).exists():
             h = Historical(coin_id=coin_obj, daily_timestamp=t, average_price=coin_average_price,
                                volume=values[-2], circulating_cap=values[-1],
-                               total_cap=circulating_cap)
+                               total_cap=total_cap)
             h.save()
+        else:
+            h = Historical.objects.get(coin_id=coin_obj,daily_timestamp=t)
+            h.total_cap = total_cap
+            h.save
 
 
