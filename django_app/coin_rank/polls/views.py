@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Coin,TimeStamp,Historical,Rank,Price_Change
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
-from .helper import beatifiy_a_number
+from .helper import beatifiy_a_number,millify
 import json
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -32,13 +32,13 @@ def index(request):
             h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
             coin.average_price = "${0:.3f}".format(h.average_price)
             coin.volume = beatifiy_a_number(h.volume)
-            coin.total_cap = "$" + str(beatifiy_a_number(h.total_cap))
-            coin.circulating_cap = "$" + str(beatifiy_a_number(h.circulating_cap))
-            coin.circulating_cap_bitcoin = "฿" + str(beatifiy_a_number(round(h.circulating_cap / bitcoin_price, 2)))
+            coin.total_cap = "$" + str(millify(h.total_cap))
+            coin.circulating_cap = "$" + str(millify(h.circulating_cap))
+            coin.circulating_cap_bitcoin = "B " + str(millify(round(h.circulating_cap / bitcoin_price, 2)))
             r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
             coin.rank = r.rank
             p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
-            coin.price_change = round(p.price_change, 2)
+            coin.price_change = round(p.price_change, 2) * 100
             altered_coins.append(coin)
         except:
             continue
