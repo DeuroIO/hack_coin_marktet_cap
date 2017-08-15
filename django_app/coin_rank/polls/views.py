@@ -31,7 +31,7 @@ def index(request):
         try:
             h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
             coin.average_price = "${0:.3f}".format(h.average_price)
-            coin.volume = beatifiy_a_number(h.volume)
+            coin.volume = "$" + str(millify(h.volume))
             coin.total_cap = "$" + str(millify(h.total_cap))
             coin.circulating_cap = "$" + str(millify(h.circulating_cap))
             coin.circulating_cap_bitcoin = "B " + str(millify(round(h.circulating_cap / bitcoin_price, 2)))
