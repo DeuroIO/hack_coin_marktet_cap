@@ -4,10 +4,8 @@
 <head>
     <title>Dashboard</title>
     {% bootstrap_css %}
-
-    <link href="{% static 'django_tables2/bootstrap.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet"/>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="{% static 'js/style.js'%}"></script>
     <link href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet"/>
     <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <link href="{% static 'css/screen.css' %}" rel="stylesheet"/>
@@ -19,15 +17,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.js"></script>
 
 <script type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 $(document).ready(function()
 {
   $("tr:even").css("background-color", "#FFFFFF");
   // With JQuery
   token = $("#change_password-form").find('input[name=csrfmiddlewaretoken]').val()
 $("#ex6").slider();
-$("#ex6").on("slide", {csrfmiddlewaretoken: token},function(slideEvt) {
+var form = document.getElementById('submit_form');
+$("#ex6").on("slideStop", {csrfmiddlewaretoken: token},function(slideEvt) {
+form.submit();
 	$("#ex6SliderVal").text(slideEvt.value);
-
 });
 });
     </script>
@@ -43,7 +71,7 @@ $("#ex6").on("slide", {csrfmiddlewaretoken: token},function(slideEvt) {
             <!--<input type="submit" value="Sync-Up">-->
         <!--</form>-->
     <!--</div>-->
-    <form action="slide_to" method="post">
+    <form action="slide_to" method="post" id="submit_form">
         {% csrf_token %}
         <input style="width:1000px;" id="ex6" type="text" name='slider_value' data-slider-min="1" data-slider-max="{{max_timestamp}}"
                data-slider-step="1"

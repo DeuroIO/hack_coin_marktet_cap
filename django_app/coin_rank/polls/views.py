@@ -43,6 +43,7 @@ def index(request):
     coins = sorted(altered_coins, key=lambda x: x.rank)
     
     timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
+    print('new_page with len(coins):' + str(len(coins)))
     return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
 
 def detail(request):
