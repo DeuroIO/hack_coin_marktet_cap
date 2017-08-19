@@ -4,7 +4,6 @@ from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
 from .helper import beatifiy_a_number,millify
 import datetime
 from django.http import JsonResponse
-from django.core import serializers
 import json
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
