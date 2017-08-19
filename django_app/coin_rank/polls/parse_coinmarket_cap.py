@@ -67,6 +67,7 @@ def get_historical_data_for_url(url,coin_obj):
             break
 
     trs = soup.findAll("tr",{'class':'text-right'})
+    timestamp_sets = set()
     for tr in trs:
         counts = 0
         values = []
@@ -85,9 +86,7 @@ def get_historical_data_for_url(url,coin_obj):
                 else:
                     values.append(float(td.text))
                 counts += 1
-        if not TimeStamp.objects.filter(daily_timestamp=values[0]).exists():
-            t = TimeStamp(daily_timestamp=values[0])
-            t.save()
+        timestamp_sets.add(values[0])
 
         t = TimeStamp.objects.get(daily_timestamp=values[0])
         coin_average_price = mean(values[1:5])
@@ -103,5 +102,5 @@ def get_historical_data_for_url(url,coin_obj):
             h = Historical.objects.get(coin_id=coin_obj,daily_timestamp=t)
             h.total_cap = total_cap
             h.save
-
+    return timestamp_sets
 

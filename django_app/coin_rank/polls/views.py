@@ -3,6 +3,7 @@ from .models import Coin,TimeStamp,Historical,Rank,Price_Change
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
 from .helper import beatifiy_a_number,millify
 import datetime
+import itertools
 from django.http import JsonResponse
 import json
 #!/usr/bin/env python
@@ -43,7 +44,6 @@ def index(request):
     coins = sorted(altered_coins, key=lambda x: x.rank)
     
     timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
-    print('new_page with len(coins):' + str(len(coins)))
     return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
 
 def detail(request):
@@ -70,14 +70,16 @@ def save_investment_memo(request):
 
 def sync_up(request):
     coin_to_url = get_all_coins()
-
+    all_timestamps_set = set()
     for coin in coin_to_url:
         url = coin_to_url[coin]
         if not Coin.objects.filter(coin_name=coin).exists():
             c = Coin(coin_name=coin,sector='',tech='',star=0,investment_memo='')
             c.save()
-        get_historical_data_for_url(url,Coin.objects.get(coin_name=coin))
-
+        small_timestamp_sets = get_historical_data_for_url(url,Coin.objects.get(coin_name=coin))
+        all_timestamps_set = itertools.chain(all_timestamps_set,small_timestamp_sets)
+    print(all_timestamps_set)
+    return
     all_coins = Coin.objects.all()
     all_timestamps = TimeStamp.objects.all()
     # #
