@@ -83,9 +83,13 @@ def sync_up(request):
         if testing > 1:
             break
         testing += 1
-    timestamps_set = list(timestamps_set).sort()
-    for m_timestamp in timestamps_set:
-        if not TimeStamp.objects.get(daily_timestamp=m_timestamp).exists():
+
+    print("len(timestamps_set):{}".format(len(timestamps_set)))
+    timestamps_set_list = list(timestamps_set)
+    print("len(timestamps_set_list)):{}".format(len(timestamps_set_list)))
+    timestamps_set_list.sort()
+    for m_timestamp in timestamps_set_list:
+        if not TimeStamp.objects.all().filter(daily_timestamp=m_timestamp).exists():
             t = TimeStamp(daily_timestamp=m_timestamp)
             t.save()
 
