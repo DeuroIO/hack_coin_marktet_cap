@@ -2,16 +2,15 @@ from django.shortcuts import render
 from .models import Coin,TimeStamp,Historical,Rank,Price_Change
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
 from .helper import beatifiy_a_number,millify
+import datetime
+from django.http import JsonResponse
+from django.core import serializers
 import json
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 def index(request):
     slider_timestamps = TimeStamp.objects.all()
-    id_to_timestamps_mapping = dict()
-    for timestamp in slider_timestamps:
-        id_to_timestamps_mapping[len(slider_timestamps) - timestamp.id + 1] = "{:%b, %d %Y}".format(timestamp.daily_timestamp)
-    print(id_to_timestamps_mapping)
     if request.method == "POST":
         slider_value = request.POST.get('slider_value')
         slider_timestamp_id = len(slider_timestamps) - int(slider_value) + 1
@@ -43,13 +42,27 @@ def index(request):
         except:
             continue
     coins = sorted(altered_coins, key=lambda x: x.rank)
-
-    return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),"id_to_timestamps_mapping":json.dumps(id_to_timestamps_mapping)})
+    
+    timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
+    return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
 
 def detail(request):
-    in_name = request.GET.get('id', 'None')
-    print(in_name)
-    return render(request, 'detail.html')
+    id = request.GET.get('id', 'None')
+    coin_name = Coin.objects.get(id=id).coin_name
+    return render(request, 'detail.html',{'token_title':coin_name})
+
+def detail_rank_for_coin(request):
+    id = request.GET.get('id')
+    array = []
+    coin = Coin.objects.get(id=id)
+    timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
+    for timestamp in timestamps:
+        try:
+            r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
+            array.append([timestamp.daily_timestamp, r.rank])
+        except:
+            continue
+    return JsonResponse(array,safe=False)
 
 def save_investment_memo(request):
     in_coin = request.POST.get('id', 'None')

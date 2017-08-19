@@ -1,6 +1,12 @@
-$.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.json&callback=?', function (data) {
+var url = new URL(document.URL);
+var id = url.searchParams.get("id");
+var final_url = 'http://127.0.0.1:8000/detail_rank/?id=' + id;
+$.getJSON(final_url, function (data) {
     var detailChart;
-
+    var arrayLength = data.length;
+    for (var i = 0; i < arrayLength; i++) {
+        data[i][0] = new Date(data[i][0]).getTime();
+    }
     $(document).ready(function () {
 
         // create the detail chart
@@ -15,7 +21,6 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
                     detailData.push(this.y);
                 }
             });
-
             // create a detail chart referenced by a global variable
             detailChart = Highcharts.chart('detail-container', {
                 chart: {
@@ -31,7 +36,7 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
                     enabled: false
                 },
                 title: {
-                    text: 'Historical USD to EUR Exchange Rate'
+                    text: 'Token rank'
                 },
                 subtitle: {
                     text: 'Select an area by dragging across the lower chart'
@@ -43,13 +48,14 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
                     title: {
                         text: null
                     },
-                    maxZoom: 0.1
+                    maxZoom: 0.1,
+                    reversed: true
                 },
                 tooltip: {
                     formatter: function () {
                         var point = this.points[0];
                         return '<b>' + point.series.name + '</b><br/>' + Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-                            '1 USD = ' + Highcharts.numberFormat(point.y, 2) + ' EUR';
+                            Highcharts.numberFormat(point.y, 2);
                     },
                     shared: true
                 },
@@ -70,7 +76,7 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
                     }
                 },
                 series: [{
-                    name: 'USD to EUR',
+                    name: 'Coin rank',
                     pointStart: detailStart,
                     pointInterval: 24 * 3600 * 1000,
                     data: detailData
@@ -130,6 +136,7 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
 
 
                             detailChart.series[0].setData(detailData);
+
 
                             return false;
                         }
@@ -199,7 +206,7 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.jso
 
                 series: [{
                     type: 'area',
-                    name: 'USD to EUR',
+                    name: 'Coin rank',
                     pointInterval: 24 * 3600 * 1000,
                     pointStart: data[0][0],
                     data: data

@@ -3,35 +3,15 @@
 <head>
     <title>Detail page</title>
     {% bootstrap_css %}
-
-    <link href="{% static 'django_tables2/bootstrap.css' %}" rel="stylesheet"/>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script type="text/javascript" src="{% static 'js/style.js' %}"></script>
-
-    <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=tcmtvlmccecvhqt99215e4o2jnvihazg2old73k4puo2een9"></script>
-  <script>tinymce.init({
-  selector: 'textarea',
-  height: 270,
-  theme: 'modern',
-  plugins: "save",
-    toolbar: "save",
-    save_enablewhendirty: true,
-    save_onsavecallback: function() {
-                        // USE THIS IN YOUR AJAX CALL
-                alert(tinyMCE.get('ajax_text').getContent());
-        },
-  content_css: [
-    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-    '//www.tinymce.com/css/codepen.min.css'
-  ],
- });</script>
 </head>
 <body>
-<button type="button" class="btn btn-lg btn-primary" onClick="javascript:history.go(-1);">Previous Page</button>
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-
-<textarea name="ajax_text"></textarea>
-
+<div style="text-align: center;">
+    <h1>{{token_title}}</h1>
+    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    <button type="button" class="btn btn-lg btn-primary" onClick="javascript:history.go(-1);">Previous Page</button>
+</div>
 </body>

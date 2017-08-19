@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^slide_to', views.index, name='Slide'),
     url(r'sync_up', views.sync_up,name='Sync'),
     url(r'^save_memo/$', views.save_investment_memo, name='Memo'),
+    url(r'^detail_rank/$',views.detail_rank_for_coin,name='Detail'),
 ]
