@@ -40,7 +40,7 @@ def get_all_coins():
         coin_to_url[name] = link
     return coin_to_url
 
-def get_historical_data_for_url(url,coin_obj):
+def get_historical_data_for_url(url):
     now = datetime.datetime.now()
     url = url + str(now.year)
     if now.month < 10:
@@ -67,7 +67,8 @@ def get_historical_data_for_url(url,coin_obj):
             break
 
     trs = soup.findAll("tr",{'class':'text-right'})
-    timestamp_sets = set()
+    timestamp_dict = dict()
+    timestamp_set = set()
     for tr in trs:
         counts = 0
         values = []
@@ -86,21 +87,17 @@ def get_historical_data_for_url(url,coin_obj):
                 else:
                     values.append(float(td.text))
                 counts += 1
-        timestamp_sets.add(values[0])
 
-        t = TimeStamp.objects.get(daily_timestamp=values[0])
+
         coin_average_price = mean(values[1:5])
         total_cap = values[-1]
         if total_supply != 0:
             total_cap = coin_average_price * total_supply
-        if not Historical.objects.all().filter(coin_id=coin_obj).filter(daily_timestamp=t).exists():
-            h = Historical(coin_id=coin_obj, daily_timestamp=t, average_price=coin_average_price,
-                               volume=values[-2], circulating_cap=values[-1],
-                               total_cap=total_cap)
-            h.save()
-        else:
-            h = Historical.objects.get(coin_id=coin_obj,daily_timestamp=t)
-            h.total_cap = total_cap
-            h.save
-    return timestamp_sets
+
+        if values[0] not in timestamp_dict:
+            timestamp_set.add(values[0])
+            timestamp_dict[values[0]] = {'average_price':coin_average_price,
+                               'volume':values[-2], 'circulating_cap':values[-1],
+                               'total_cap':total_cap}
+    return timestamp_dict,timestamp_set
 
