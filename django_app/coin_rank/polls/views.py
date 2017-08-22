@@ -72,6 +72,19 @@ def detail_rank_for_coin(request):
             continue
     return JsonResponse(array,safe=False)
 
+def detail_cap_for_coin(request):
+    id = request.GET.get('id')
+    array = []
+    coin = Coin.objects.get(id=id)
+    timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
+    for timestamp in timestamps:
+        try:
+            h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
+            array.append([timestamp.daily_timestamp, h.circulating_cap])
+        except:
+            continue
+    return JsonResponse(array, safe=False)
+
 def save_investment_memo(request):
     in_coin = request.POST.get('id', 'None')
     print(request)

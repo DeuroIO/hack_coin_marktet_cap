@@ -1,6 +1,6 @@
 var url = new URL(document.URL);
 var id = url.searchParams.get("id");
-var final_url = "http://127.0.0.1:8000/detail_rank/?id=" + id;
+var final_url = "http://127.0.0.1:8000/detail_cap/?id=" + id;
 $.getJSON(final_url, function (data) {
     var detailChart;
     var arrayLength = data.length;
@@ -22,7 +22,7 @@ $.getJSON(final_url, function (data) {
                 }
             });
             // create a detail chart referenced by a global variable
-            detailChart = Highcharts.chart('detail-container', {
+            detailChart = Highcharts.chart('detail-container-2', {
                 chart: {
                     marginBottom: 120,
                     reflow: false,
@@ -36,7 +36,7 @@ $.getJSON(final_url, function (data) {
                     enabled: false
                 },
                 title: {
-                    text: 'Token rank'
+                    text: 'Circulating Market Cap'
                 },
                 xAxis: {
                     type: 'datetime'
@@ -73,7 +73,7 @@ $.getJSON(final_url, function (data) {
                     }
                 },
                 series: [{
-                    name: 'Coin rank',
+                    name: 'Circulating market cap',
                     pointStart: detailStart,
                     pointInterval: 24 * 3600 * 1000,
                     data: detailData
@@ -88,7 +88,7 @@ $.getJSON(final_url, function (data) {
 
         // create the master chart
         function createMaster() {
-            Highcharts.chart('master-container', {
+            Highcharts.chart('master-container-2', {
                 chart: {
                     reflow: false,
                     borderWidth: 0,
@@ -219,13 +219,13 @@ $.getJSON(final_url, function (data) {
         }
 
         // make the container smaller and add a second container for the master chart
-        var $container = $('#container')
+        var $container = $('#cap_container')
             .css('position', 'relative');
 
-        $('<div id="detail-container">')
+        $('<div id="detail-container-2">')
             .appendTo($container);
 
-        $('<div id="master-container">')
+        $('<div id="master-container-2">')
             .css({
                 position: 'absolute',
                 top: 300,
