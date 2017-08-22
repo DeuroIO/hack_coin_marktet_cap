@@ -23,36 +23,35 @@ def index(request):
     coins = Coin.objects.all()
 
     if len(coins) == 0:
-        print('return empty page')
         return render(request,'index.html',{'coins':[]})
 
     bitcoin = Coin.objects.get(coin_name='Bitcoin')
     bitcoin_price = Historical.objects.get(coin_id=bitcoin,daily_timestamp=timestamp).average_price
-    print("bitcoin_price:{}".format(bitcoin_price))
     altered_coins = []
     for coin in coins:
         try:
             h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
-            print(h)
             coin.average_price = "${0:.3f}".format(h.average_price)
             coin.volume = "$" + str(millify(h.volume))
             coin.total_cap = "$" + str(millify(h.total_cap))
             coin.circulating_cap = "$" + str(millify(h.circulating_cap))
             coin.circulating_cap_bitcoin = "B " + str(millify(round(h.circulating_cap / bitcoin_price, 2)))
-            r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
-            print("rank:{}".format(r))
-            coin.rank = r.rank
-            p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
-            print("price_change:{}".format(p))
-            coin.price_change = round(p.price_change, 2) * 100
+            try:
+                r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
+                coin.rank = r.rank
+            except:
+                pass
+            try:
+                p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
+                coin.price_change = round(p.price_change, 2) * 100
+            except:
+                pass
             altered_coins.append(coin)
         except:
             continue
-    print(altered_coins)
     coins = sorted(altered_coins, key=lambda x: x.rank)
 
     timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
-    print(len(coins))
     return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
 
 def detail(request):
@@ -83,15 +82,15 @@ def sync_up(request):
     #For adding sorted timestamps
     coin_timestamp_historical_dict = dict()
     timestamps_set = set()
-    testing = 0
+    #testing = 0
     for coin in coin_to_url:
         url = coin_to_url[coin]
         small_time_dict,small_timestamp_set = get_historical_data_for_url(url)
         timestamps_set = timestamps_set.union(small_timestamp_set)
         coin_timestamp_historical_dict[coin] = small_time_dict
-        if testing > 1:
-            break
-        testing += 1
+        #if testing > 1:
+        #    break
+        #testing += 1
 
     timestamps_set_list = list(timestamps_set)
     timestamps_set_list.sort()
