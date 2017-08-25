@@ -6,6 +6,7 @@ import datetime
 import numpy
 from django.http import JsonResponse
 import json
+from threading import Timer
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -36,19 +37,29 @@ def index(request):
             coin.total_cap = "$" + str(millify(h.total_cap))
             coin.circulating_cap = "$" + str(millify(h.circulating_cap))
             coin.circulating_cap_bitcoin = "B " + str(millify(round(h.circulating_cap / bitcoin_price, 2)))
+            print(coin)
             try:
                 r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
                 coin.rank = r.rank
+                print(coin.rank)
             except:
                 pass
             try:
                 p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
+                print(p)
                 coin.price_change = round(p.price_change, 2) * 100
+                print(coin.price_change)
             except:
+                print("dones't have price change for {} at {} ".format(coin,timestamp))
                 pass
+                
+            #print(coin)
+            #print(coin.price_change)
             altered_coins.append(coin)
         except:
             continue
+    #Sanity check to remove coin if it doesn't have rank
+    altered_coins = [s for s in altered_coins if hasattr(s, 'rank')]
     coins = sorted(altered_coins, key=lambda x: x.rank)
 
     timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
@@ -89,21 +100,21 @@ def save_investment_memo(request):
     in_coin = request.POST.get('id', 'None')
     print(request)
 
-def sync_up(request):
+def sync_up(request=None):
     coin_to_url = get_all_coins()
 
     #For adding sorted timestamps
     coin_timestamp_historical_dict = dict()
     timestamps_set = set()
-    #testing = 0
+    testing = 0
     for coin in coin_to_url:
         url = coin_to_url[coin]
         small_time_dict,small_timestamp_set = get_historical_data_for_url(url)
         timestamps_set = timestamps_set.union(small_timestamp_set)
         coin_timestamp_historical_dict[coin] = small_time_dict
-        #if testing > 1:
-        #    break
-        #testing += 1
+        if testing > 1:
+            break
+        testing += 1
 
     timestamps_set_list = list(timestamps_set)
     timestamps_set_list.sort()
@@ -156,11 +167,16 @@ def sync_up(request):
     for coin in all_coins:
         historicals = Historical.objects.all().filter(coin_id=coin).order_by('-daily_timestamp')
         for x in range(1,len(historicals)):
-            if not Price_Change.objects.all().filter(coin_id=coin).filter(daily_timestamp=timestamp).exists():
+            if not Price_Change.objects.filter(coin_id=coin).filter(daily_timestamp=timestamp).exists():
                 historical = historicals[x]
                 previous_price = historicals[x-1].average_price
                 current_price = historical.average_price
                 price_change_percantage = ((current_price - previous_price) / previous_price)
                 p = Price_Change(coin_id=coin,daily_timestamp=historical.daily_timestamp,price_change=price_change_percantage)
                 p.save()
+    Timer(interval, sync_up).start()
     return index(request)
+
+interval = 24 * 3600   #interval (4hours)
+
+Timer(interval, sync_up).start() 

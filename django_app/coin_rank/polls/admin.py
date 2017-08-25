@@ -10,7 +10,7 @@ class CoinAdmin(admin.ModelAdmin):
 
 class HistoricalAdmin(admin.ModelAdmin):
     list_display = ('coin_id','daily_timestamp','average_price','volume','circulating_cap','total_cap','created_at','updated_at')
-    search_fields = ['coin_id__coin_name', 'daily_timestamp', ]
+    search_fields = ['coin_id','daily_timestamp', ]
 
 class RankAdmin(admin.ModelAdmin):
     list_display = ('coin_id','daily_timestamp','rank','created_at','updated_at')

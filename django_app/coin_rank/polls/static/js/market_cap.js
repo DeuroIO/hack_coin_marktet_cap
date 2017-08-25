@@ -1,6 +1,6 @@
 var url = new URL(document.URL);
 var id = url.searchParams.get("id");
-var final_url = "http://127.0.0.1:8000/detail_cap/?id=" + id;
+var final_url = "http://tokenranks.com/detail_cap/?id=" + id;
 $.getJSON(final_url, function (data) {
     var detailChart;
     var arrayLength = data.length;
@@ -46,7 +46,7 @@ $.getJSON(final_url, function (data) {
                         text: null
                     },
                     maxZoom: 0.1,
-                    reversed: true
+                    reversed: false
                 },
                 tooltip: {
                     formatter: function () {
