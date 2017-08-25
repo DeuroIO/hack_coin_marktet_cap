@@ -41,6 +41,7 @@ def index(request):
                 r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
                 coin.rank = r.rank
             except:
+                print("dones't have rank for {} at {}".format(coin,timestamp))
                 pass
             try:
                 p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
@@ -102,15 +103,15 @@ def sync_up(request=None):
     #For adding sorted timestamps
     coin_timestamp_historical_dict = dict()
     timestamps_set = set()
-    testing = 0
+    #testing = 0
     for coin in coin_to_url:
         url,img_name = coin_to_url[coin]
         small_time_dict,small_timestamp_set = get_historical_data_for_url(url)
         timestamps_set = timestamps_set.union(small_timestamp_set)
         coin_timestamp_historical_dict[coin] = [small_time_dict,img_name]
-        if testing > 1:
-           break
-        testing += 1
+        #if testing > 1:
+        #   break
+        #testing += 1
 
     timestamps_set_list = list(timestamps_set)
     timestamps_set_list.sort()
