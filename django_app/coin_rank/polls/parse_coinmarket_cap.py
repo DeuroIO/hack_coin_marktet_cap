@@ -1,21 +1,20 @@
-import urllib
 from bs4 import BeautifulSoup
 import sys
 from re import sub
 from decimal import Decimal
 import datetime
-from .models import Historical,Coin, TimeStamp
 from numpy import mean
 import re
-import pytz
+import os.path
+BASE = os.path.dirname(os.path.abspath(__file__))
 
 if sys.version_info[0] == 3:
-    from urllib.request import urlopen
+    from urllib.request import urlopen,urlretrieve
 else:
     # Not Python 3 - today, it is most likely to be Python 2
     # But note that this might need an update when Python 4
     # might be around one day
-    from urllib import urlopen
+    from urllib import urlopen,urlretrieve
 
 def get_html_by_url(url):
     # Your code where you can use urlopen
@@ -36,8 +35,13 @@ def get_all_coins():
     for arr in arrs:
         imgs = arr.findAll('img', {'class': 'currency-logo'})
         name = imgs[0]['alt']
+        img_link = imgs[0]['src']
+        img_name = img_link.split('/')[-1]
+        img_path_name = '{}/static/images/{}'.format(BASE,img_name)
+        if not os.path.isfile(img_path_name):
+            urlretrieve(img_link,img_path_name)
         link = base_url + arr.findAll('a')[0]['href'] + "historical-data?start=20130428&end="
-        coin_to_url[name] = link
+        coin_to_url[name] = [link,"static/images/{}".format(img_name)]
     return coin_to_url
 
 def get_historical_data_for_url(url):

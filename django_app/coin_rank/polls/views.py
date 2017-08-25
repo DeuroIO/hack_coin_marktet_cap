@@ -37,18 +37,14 @@ def index(request):
             coin.total_cap = "$" + str(millify(h.total_cap))
             coin.circulating_cap = "$" + str(millify(h.circulating_cap))
             coin.circulating_cap_bitcoin = "B " + str(millify(round(h.circulating_cap / bitcoin_price, 2)))
-            print(coin)
             try:
                 r = Rank.objects.get(coin_id=coin, daily_timestamp=timestamp)
                 coin.rank = r.rank
-                print(coin.rank)
             except:
                 pass
             try:
                 p = Price_Change.objects.get(coin_id=coin, daily_timestamp=timestamp)
-                print(p)
                 coin.price_change = round(p.price_change, 2) * 100
-                print(coin.price_change)
             except:
                 print("dones't have price change for {} at {} ".format(coin,timestamp))
                 pass
@@ -106,15 +102,15 @@ def sync_up(request=None):
     #For adding sorted timestamps
     coin_timestamp_historical_dict = dict()
     timestamps_set = set()
-    #testing = 0
+    testing = 0
     for coin in coin_to_url:
-        url = coin_to_url[coin]
+        url,img_name = coin_to_url[coin]
         small_time_dict,small_timestamp_set = get_historical_data_for_url(url)
         timestamps_set = timestamps_set.union(small_timestamp_set)
-        coin_timestamp_historical_dict[coin] = small_time_dict
-        #if testing > 1:
-        #    break
-        #testing += 1
+        coin_timestamp_historical_dict[coin] = [small_time_dict,img_name]
+        if testing > 1:
+           break
+        testing += 1
 
     timestamps_set_list = list(timestamps_set)
     timestamps_set_list.sort()
@@ -125,14 +121,15 @@ def sync_up(request=None):
 
     #For adding coins & historicals
     for coin in coin_timestamp_historical_dict:
+        small_time_dict, img_name = coin_timestamp_historical_dict[coin]
         if not Coin.objects.filter(coin_name=coin).exists():
-            c = Coin(coin_name=coin,sector='',tech='',star=0,investment_memo='')
+            c = Coin(coin_name=coin,image=img_name,sector='',tech='',star=0,investment_memo='')
             c.save()
         coin_obj = Coin.objects.get(coin_name=coin)
         for timestamp in timestamps_set:
             t = TimeStamp.objects.get(daily_timestamp=timestamp)
-            if timestamp in coin_timestamp_historical_dict[coin]:
-                h_small_dict = coin_timestamp_historical_dict[coin][timestamp]
+            if timestamp in small_time_dict:
+                h_small_dict = small_time_dict[timestamp]
                 if not Historical.objects.all().filter(coin_id=coin_obj).filter(daily_timestamp=t).exists():
                     h = Historical(coin_id=coin_obj, daily_timestamp=t, average_price=h_small_dict["average_price"],
                     volume=h_small_dict['volume'], circulating_cap=h_small_dict['circulating_cap'],

@@ -13,6 +13,7 @@ class Coin(models.Model):
         except:
             return -1
     coin_name = models.CharField(max_length=1024)
+    image = models.ImageField('img', upload_to='images/')
     sector = models.CharField(max_length=1024)
     tech = models.CharField(max_length=1024)
     star = models.IntegerField(default=-1)

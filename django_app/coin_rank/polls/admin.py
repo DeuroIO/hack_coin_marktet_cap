@@ -4,7 +4,7 @@ from .models import *
 
 
 class CoinAdmin(admin.ModelAdmin):
-    list_display = ('coin_name','sector','tech','star','investment_memo','created_at','updated_at')
+    list_display = ('coin_name','image','sector','tech','star','investment_memo','created_at','updated_at')
     search_fields = ['coin_name','sector',]
 
 

@@ -98,7 +98,7 @@ form.submit();
                 <tbody>
                 <tr>
                     <th scope="row">{{ c.rank }}</th>
-                    <td><a class="btn-link" href="/coin/?id={{ c.id }}">{{ c.coin_name }}</a></td>
+                    <td><img src="{{c.image}}"><a class="btn-link" href="/coin/?id={{ c.id }}">  {{ c.coin_name }}</a></td>
                     <td>{{ c.circulating_cap }}</td>
                     <td>{{ c.circulating_cap_bitcoin }}</td>
                     <td>{{ c.total_cap }}</td>
