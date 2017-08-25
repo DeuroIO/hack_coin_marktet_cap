@@ -106,15 +106,15 @@ def sync_up(request=None):
     #For adding sorted timestamps
     coin_timestamp_historical_dict = dict()
     timestamps_set = set()
-    testing = 0
+    #testing = 0
     for coin in coin_to_url:
         url = coin_to_url[coin]
         small_time_dict,small_timestamp_set = get_historical_data_for_url(url)
         timestamps_set = timestamps_set.union(small_timestamp_set)
         coin_timestamp_historical_dict[coin] = small_time_dict
-        if testing > 1:
-            break
-        testing += 1
+        #if testing > 1:
+        #    break
+        #testing += 1
 
     timestamps_set_list = list(timestamps_set)
     timestamps_set_list.sort()
@@ -165,18 +165,22 @@ def sync_up(request=None):
 
     # #calculate price change
     for coin in all_coins:
-        historicals = Historical.objects.all().filter(coin_id=coin).order_by('-daily_timestamp')
-        for x in range(1,len(historicals)):
+        for x in range(1,len(all_timestamps)):
+            timestamp = all_timestamps[x]
+            prev_timestamp = all_timestamps[x-1]
+            print("{} {}:{}".format(coin,timestamp,Price_Change.objects.filter(coin_id=coin).filter(daily_timestamp=timestamp).exists()))
             if not Price_Change.objects.filter(coin_id=coin).filter(daily_timestamp=timestamp).exists():
-                historical = historicals[x]
-                previous_price = historicals[x-1].average_price
-                current_price = historical.average_price
-                price_change_percantage = ((current_price - previous_price) / previous_price)
-                p = Price_Change(coin_id=coin,daily_timestamp=historical.daily_timestamp,price_change=price_change_percantage)
-                p.save()
+                try:
+                    historical = Historical.objects.get(coin_id=coin,daily_timestamp=timestamp)
+                    previous_hist = Historical.objects.get(coin_id=coin,daily_timestamp=prev_timestamp)
+                    current_price = historical.average_price
+                    previous_price = previous_hist.average_price
+                    price_change_percantage = ((current_price - previous_price) / previous_price)
+                    p = Price_Change(coin_id=coin,daily_timestamp=historical.daily_timestamp,price_change=price_change_percantage)
+                    p.save()
+                except:
+                    continue
     Timer(interval, sync_up).start()
     return index(request)
 
-interval = 24 * 3600   #interval (4hours)
-
-Timer(interval, sync_up).start() 
+interval = 3600 * 20   #interval (4hours)
