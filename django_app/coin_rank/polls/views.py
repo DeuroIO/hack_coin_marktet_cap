@@ -101,7 +101,7 @@ def index(request):
     for coin in coins:
         coin.image = coin.image.url[6:]
     #if ico parameters != None
-    if ico != None:
+    if ico != 'None':
       if ico == 'bad':
           ico_description = "Within the first month of its ICO, the average price of this coin is smaller than 1.5x of its ICO price"
       else:
