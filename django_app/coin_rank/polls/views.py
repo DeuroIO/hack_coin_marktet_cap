@@ -102,7 +102,11 @@ def index(request):
         coin.image = coin.image.url[6:]
     #if ico parameters != None
     if ico != None:
-      return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
+      if ico == 'bad':
+          ico_description = "Within the first month of its ICO, the average price of this coin is smaller than 1.5x of its ICO price"
+      else:
+          ico_description = "Within the first month of its ICO, the average price of this coin is 2x > than its ICO price"
+      return render(request,'ico.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s,'ico':ico,'ico_description':ico_description})
     else:
       return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
 
