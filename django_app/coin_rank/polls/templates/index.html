@@ -59,7 +59,8 @@ form.submit();
 });
 });
     </script>
-
+{% load static %}
+{% static "" as baseUrl %}
 <div class="container">
     <div class="col-md-6">
         <h1>Dashboard for top100 coin-rank</h1>
@@ -98,7 +99,7 @@ form.submit();
                 <tbody>
                 <tr>
                     <th scope="row">{{ c.rank }}</th>
-                    <td><img src="{{c.image}}"><a class="btn-link" href="/coin/?id={{ c.id }}">  {{ c.coin_name }}</a></td>
+                    <td><img src="{{ baseUrl }}{{c.image}}"><a class="btn-link" href="/coin/?id={{ c.id }}">  {{ c.coin_name }}</a></td>
                     <td>{{ c.circulating_cap }}</td>
                     <td>{{ c.circulating_cap_bitcoin }}</td>
                     <td>{{ c.total_cap }}</td>
