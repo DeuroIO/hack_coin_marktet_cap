@@ -65,13 +65,10 @@ form.submit();
     <div class="col-md-6">
         <h1>Dashboard for top100 coin-rank</h1>
         <h2> {{timestamp_s}}</h2>
+        <a href="{% url 'GoodICO' %}"><button type="button" class="btn btn-lg btn-primary">Good ICO</button></a>
+        <a href="{% url 'BadICO' %}"><button type="button" class="btn btn-lg btn-primary">Bad ICO</button></a>
     </div>
-    <!--<div class="col-md-6">-->
-        <!--<br>-->
-        <!--<form action="/sync_up" method="GET">-->
-            <!--<input type="submit" value="Sync-Up">-->
-        <!--</form>-->
-    <!--</div>-->
+
     <form action="slide_to" method="post" id="submit_form">
         {% csrf_token %}
         <input style="width:1000px;" id="ex6" type="text" name='slider_value' data-slider-min="1" data-slider-max="{{max_timestamp}}"
