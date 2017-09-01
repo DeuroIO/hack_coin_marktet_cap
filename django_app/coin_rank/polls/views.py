@@ -21,7 +21,41 @@ def index(request):
         if len(slider_timestamps) == 0:
             return render(request,'index.html',{'coins':[]})
         timestamp = TimeStamp.objects.latest('daily_timestamp')
+
+        # Check GET to see if use good_ico or bad_ico
+        ico = request.GET.get('ico', 'None')
     coins = Coin.objects.all()
+    if 'good' == ico:
+        filtered_coins = []
+        for coin in coins:
+            coin_historicals = Historical.objects.filter(coin_id=coin).order_by('daily_timestamp')
+            intail_ico_price = coin_historicals[0].average_price
+            two_x_intail_ico_price = 2 * intail_ico_price
+            for h_index in range(1,31):
+                if coin_historicals[h_index].average_price >= two_x_intail_ico_price:
+                    filtered_coins.append(coin)
+                    #current price is 2x than intail_ico_price.
+                    #add it to the filtered_coins
+                    #next coins
+                    break
+        coins = filtered_coins
+    elif 'bad' == ico:
+        filtered_coins = []
+        for coin in coins:
+            coin_historicals = Historical.objects.filter(coin_id=coin).order_by('daily_timestamp')
+            intail_ico_price = coin_historicals[0].average_price
+            one_point_five_intail_ico_price = 1.5 * intail_ico_price
+            is_always_lower_than_one_point_five = True
+            for h_index in range(1, 31):
+                if coin_historicals[h_index].average_price > one_point_five_intail_ico_price:
+                    #current price is greater than half_intail_ico_price
+                    #it is not a bad coins
+                    # next coins
+                    is_always_lower_than_one_point_five = False
+                    break
+            if is_always_lower_than_one_point_five:
+                filtered_coins.append(coin)
+        coins = filtered_coins
 
     if len(coins) == 0:
         return render(request,'index.html',{'coins':[]})
@@ -61,6 +95,16 @@ def index(request):
 
     timestamp_s = timestamp.daily_timestamp.strftime('%Y-%b-%d')
     return render(request,'index.html',{'coins':coins,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps),'timestamp_s':timestamp_s})
+
+def good_ico(request):
+    request.GET._mutable = True
+    request.GET['ico'] = 'good'
+    return index(request)
+
+def bad_ico(request):
+    request.GET._mutable = True
+    request.GET['ico'] = 'bad'
+    return index(request)
 
 def detail(request):
     id = request.GET.get('id', 'None')
