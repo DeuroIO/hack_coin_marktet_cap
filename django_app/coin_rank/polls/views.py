@@ -124,7 +124,18 @@ def bad_ico(request):
 def detail(request):
     id = request.GET.get('id', 'None')
     coin_name = Coin.objects.get(id=id).coin_name
-    return render(request, 'detail.html',{'token_title':coin_name})
+
+    slider_timestamps = TimeStamp.objects.all()
+    if request.method == "POST":
+        slider_value = request.POST.get('slider_value')
+        slider_time_stamp = int(slider_value)
+        timestamp = TimeStamp.objects.get(id=slider_time_stamp)
+        ico = 'None'
+    else:
+        slider_time_stamp = len(slider_timestamps)
+        timestamp = TimeStamp.objects.latest('daily_timestamp')
+    print(slider_time_stamp)
+    return render(request, 'detail.html',{'token_title':coin_name,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps)})
 
 #pre-fetch rank information for all the coins
 global_coin_rank_dict = dict()
@@ -253,4 +264,4 @@ def sync_up(request=None):
     return index(request)
 
 interval = 3600 * 20   #interval (4hours)
-populate_gobal_coin_rank_dict()
+#populate_gobal_coin_rank_dict()

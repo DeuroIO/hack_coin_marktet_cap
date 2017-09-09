@@ -55,7 +55,7 @@ $("#ex6").slider();
 var form = document.getElementById('submit_form');
 $("#ex6").on("slideStop", {csrfmiddlewaretoken: token},function(slideEvt) {
 form.submit();
-	$("#ex6SliderVal").text(slideEvt.value);
+  $("#ex6SliderVal").text(slideEvt.value);
 });
 });
     </script>
