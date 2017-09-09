@@ -86,7 +86,7 @@ def index(request):
             except:
                 print("dones't have price change for {} at {} ".format(coin,timestamp))
                 pass
-                
+
             #print(coin)
             #print(coin.price_change)
             altered_coins.append(coin)
@@ -126,17 +126,29 @@ def detail(request):
     coin_name = Coin.objects.get(id=id).coin_name
     return render(request, 'detail.html',{'token_title':coin_name})
 
+#pre-fetch rank information for all the coins
+global_coin_rank_dict = dict()
+
+#helper function to populate global_coin_rank_dict
+def populate_gobal_coin_rank_dict():
+    global global_coin_rank_dict
+    global_coin_rank_dict = dict()
+    coins = Coin.objects.all()
+    timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
+    for coin in coins:
+        array = []
+        for timestamp in timestamps:
+            try:
+                r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
+                array.append([timestamp.daily_timestamp, r.rank])
+            except:
+                continue
+        global_coin_rank_dict[coin.id] = array
+    Timer(interval, populate_gobal_coin_rank_dict).start()
+
 def detail_rank_for_coin(request):
     id = request.GET.get('id')
-    array = []
-    coin = Coin.objects.get(id=id)
-    timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
-    for timestamp in timestamps:
-        try:
-            r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
-            array.append([timestamp.daily_timestamp, r.rank])
-        except:
-            continue
+    array = global_coin_rank_dict(id)
     return JsonResponse(array,safe=False)
 
 def detail_cap_for_coin(request):
@@ -241,3 +253,4 @@ def sync_up(request=None):
     return index(request)
 
 interval = 3600 * 20   #interval (4hours)
+populate_gobal_coin_rank_dict()
