@@ -1,2 +1,1 @@
 *.pyc
-django_app/coin_rank/db.sqlite3
