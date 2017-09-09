@@ -126,17 +126,30 @@ def detail(request):
     coin_name = Coin.objects.get(id=id).coin_name
     return render(request, 'detail.html',{'token_title':coin_name})
 
+from datetime import datetime
 def detail_rank_for_coin(request):
     id = request.GET.get('id')
     array = []
+    before_get_coin_time = datetime.now()
     coin = Coin.objects.get(id=id)
+    print("get coin time:{}".format(datetime.now()-before_get_coin_time))
+    before_get_timestamps = datetime.now()
     timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
+    print("get timestamps:{}".format(datetime.now()-before_get_timestamps))
+    before_for_loop_time = datetime.now()
+    total_rank_time = 0.0
     for timestamp in timestamps:
         try:
+            before_r_tmp = datetime.now()
             r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
+            print((datetime.now() - before_r_tmp))
+            total_rank_time += (datetime.now() - before_r_tmp).total_seconds()
             array.append([timestamp.daily_timestamp, r.rank])
         except:
             continue
+    print("after for loop:{}".format(datetime.now()-before_for_loop_time))
+    print("total_rank_time:{}".format(total_rank_time))
+    print("average rank time:{}".format(total_rank_time/len(timestamps)))
     return JsonResponse(array,safe=False)
 
 def detail_cap_for_coin(request):
