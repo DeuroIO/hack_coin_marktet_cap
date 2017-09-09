@@ -139,41 +139,59 @@ def detail(request):
 
 #pre-fetch rank information for all the coins
 global_coin_rank_dict = dict()
+global_coin_cap_dict = dict()
 
 #helper function to populate global_coin_rank_dict
 def populate_gobal_coin_rank_dict():
     global global_coin_rank_dict
     global_coin_rank_dict = dict()
+
+    global global_coin_cap_dict
+    global_coin_cap_dict = dict()
+
     coins = Coin.objects.all()
     timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
+    
+    counter = 1
     for coin in coins:
-        array = []
+        print("{} : {}".format(counter,coin))
+        counter += 1
+        rank_array = []
+        cap_array = []
         for timestamp in timestamps:
             try:
                 r = Rank.objects.get(coin_id=coin,daily_timestamp=timestamp)
-                array.append([timestamp.daily_timestamp, r.rank])
+                rank_array.append([timestamp.daily_timestamp, r.rank])
             except:
-                continue
-        global_coin_rank_dict[coin.id] = array
-    Timer(interval, populate_gobal_coin_rank_dict).start()
+                pass
+            try:
+                h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
+                cap_array.append([timestamp.daily_timestamp, h.circulating_cap])
+            except:
+                pass
+        if counter == 5:
+            break
+        if len(rank_array) != 0:
+            global_coin_rank_dict[coin.id] = rank_array
+        if len(cap_array) != 0:
+            global_coin_cap_dict[coin.id] = cap_array
+        
 
 def detail_rank_for_coin(request):
-    id = request.GET.get('id')
-    array = global_coin_rank_dict(id)
-    return JsonResponse(array,safe=False)
+    id = int(request.GET.get('id'))
+    if id in global_coin_rank_dict:
+        array = global_coin_rank_dict[id]
+        return JsonResponse(array,safe=False)
+    else:
+        return JsonResponse([],safe=False)
 
 def detail_cap_for_coin(request):
-    id = request.GET.get('id')
-    array = []
-    coin = Coin.objects.get(id=id)
-    timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
-    for timestamp in timestamps:
-        try:
-            h = Historical.objects.get(coin_id=coin, daily_timestamp=timestamp)
-            array.append([timestamp.daily_timestamp, h.circulating_cap])
-        except:
-            continue
-    return JsonResponse(array, safe=False)
+    id = int(request.GET.get('id'))
+    if id in global_coin_cap_dict:
+        array = global_coin_cap_dict[id]
+        return JsonResponse(array, safe=False)
+    else:
+        return JsonResponse([],safe=False)
 
 def save_investment_memo(request):
     in_coin = request.POST.get('id', 'None')
