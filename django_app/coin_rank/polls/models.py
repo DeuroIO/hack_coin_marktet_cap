@@ -18,6 +18,7 @@ class Coin(models.Model):
     tech = models.CharField(max_length=1024)
     star = models.IntegerField(default=-1)
     investment_memo = models.TextField()
+    contract_address = models.CharField(max_length=1024)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -57,3 +58,19 @@ class Price_Change(models.Model):
     price_change = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Account(models.Model):
+    def __str__(self):
+        return  self.gussed_name + " " + self.account_address
+    gussed_name = models.CharField(max_length=1024)
+    account_address = models.CharField(max_length=1024)
+
+class TokenTransaction(models.Model):
+    def __str__(self):
+        return self.token_name.coin_name + ": from " + self.from_account.account_address + " to " + self.to_account.account_address + " " + str(self.quantity)
+    token_name = models.ForeignKey(Coin)
+    tx_hash = models.CharField(max_length=1024)
+    timestamp = models.DateTimeField()
+    from_account = models.ForeignKey(Account,null=True, related_name='from_account')
+    to_account = models.ForeignKey(Account,null=True, related_name='to_account')
+    quantity = models.FloatField()

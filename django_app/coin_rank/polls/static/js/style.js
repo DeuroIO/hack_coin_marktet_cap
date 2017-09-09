@@ -238,5 +238,3 @@ $.getJSON(final_url, function (data) {
         createMaster();
     });
 });
-
-
