@@ -5,7 +5,7 @@ import datetime
 import collections
 
 def parse_time_to_hour(timestamp):
-    old_date = datetime.datetime.strptime(timestamp,"%d/%m/%Y %H:%M")
+    old_date = datetime.datetime.strptime(timestamp,"%Y-%m-%d %H:%M:%S")
     new_date = old_date.replace(hour=0,minute=0, second=0)
     return new_date
 

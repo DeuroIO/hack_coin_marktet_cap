@@ -8,7 +8,7 @@ cur = con.cursor()
 # cur.execute('SELECT SQLITE_VERSION()')
 # data = cur.fetchone()
 # print("SQLite version: %s" % data)
-csv_file_loc = "csv/0x.csv"
+csv_file_loc = "csv/0x_last_few_pages.csv"
 all_the_records,top_timestamp_token_holder_dict = read_csv(csv_file_loc)
 
 for timestamp in all_the_records:

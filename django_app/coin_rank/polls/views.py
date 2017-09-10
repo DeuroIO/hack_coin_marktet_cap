@@ -130,7 +130,6 @@ def detail(request):
         slider_value = request.POST.get('slider_value')
         slider_time_stamp = int(slider_value)
         timestamp = TimeStamp.objects.get(id=slider_time_stamp)
-        ico = 'None'
     else:
         slider_time_stamp = len(slider_timestamps)
         timestamp = TimeStamp.objects.latest('daily_timestamp')
