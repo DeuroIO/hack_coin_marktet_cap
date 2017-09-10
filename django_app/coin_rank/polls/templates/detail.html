@@ -20,34 +20,6 @@
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.js"></script>
   <script type="text/javascript">
-  // using jQuery
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = jQuery.trim(cookies[i]);
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-  var csrftoken = getCookie('csrftoken');
-  function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
-  $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }
-    }
-  });
 
   $(document).ready(function()
   {
@@ -70,12 +42,13 @@
     <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     <div id="cap_container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     <div class="container">
-      <h2> {{timestamp_s}} 123 timestamp</h2>
-      <form action="slide_to" method="post" id="submit_form">
+      <h2> {{timestamp_s}} </h2>
+      <form action="/coin/?id={{ coin_id }}/slide_to" method="post" id="submit_form">
         {% csrf_token %}
         <input style="width:1000px;" id="ex6" type="text" name='slider_value' data-slider-min="1" data-slider-max="{{max_timestamp}}"
         data-slider-step="1"
-        data-slider-value="{{ current_timestamp }}"/>
+        data-slider-value="{{ current_timestamp }}"/>&emsp;
+        <!-- <input type="hidden" name='coin_id' value="{{coin_id}}"></input> -->
         <span id="ex6SliderVal">{{ current_timestamp }}</span>
         <input type="submit"/>
       </form>
@@ -91,23 +64,14 @@
                 <th>Rank</th>
                 <th>Address</th>
                 <th>Quantity</th>
-                <th>Percantage</th>
               </tr>
             </thead>
-            {% for c in coins %}
+            {% for rank,account,balance in top_holder_balance_arr %}
             <tbody>
               <tr>
-                <th scope="row">{{ c.rank }}</th>
-                <td><img src="{{ baseUrl }}{{c.image}}"><a class="btn-link" href="/coin/?id={{ c.id }}">  {{ c.coin_name }}</a></td>
-                <td>{{ c.circulating_cap }}</td>
-                <td>{{ c.circulating_cap_bitcoin }}</td>
-                <td>{{ c.total_cap }}</td>
-                <td>{{ c.average_price }}</td>
-                <td>{{ c.volume }}</td>
-                <td class="
-                {% if c.price_change >= 0.0 %}green{% endif %}
-                {% if c.price_change < 0.0 %}red{% endif %}">{{ c.price_change }}%
-              </td>
+                <th scope="row">{{ rank }}</th>
+                <td>{{ account.account_address }}</td>
+                <td>{{ balance }}</td>
             </tr>
           </tbody>
           {% endfor %}
@@ -126,20 +90,13 @@
               <th>Percantage</th>
             </tr>
           </thead>
-          {% for c in coins %}
+          {% for rank,address,quantity,percantage in sort_by_quantity_transactions_arr %}
           <tbody>
             <tr>
-              <th scope="row">{{ c.rank }}</th>
-              <td><img src="{{ baseUrl }}{{c.image}}"><a class="btn-link" href="/coin/?id={{ c.id }}">  {{ c.coin_name }}</a></td>
-              <td>{{ c.circulating_cap }}</td>
-              <td>{{ c.circulating_cap_bitcoin }}</td>
-              <td>{{ c.total_cap }}</td>
-              <td>{{ c.average_price }}</td>
-              <td>{{ c.volume }}</td>
-              <td class="
-              {% if c.price_change >= 0.0 %}green{% endif %}
-              {% if c.price_change < 0.0 %}red{% endif %}">{{ c.price_change }}%
-            </td>
+              <th scope="row">{{ rank }}</th>
+              <td>{{ address.account_address }}</td>
+              <td>{{ quantity }}</td>
+              <td>{{ percantage }}</td>
           </tr>
         </tbody>
         {% endfor %}

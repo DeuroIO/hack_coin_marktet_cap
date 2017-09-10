@@ -1,5 +1,9 @@
 from django.db import models
 
+class TimeStamp(models.Model):
+    def __str__(self):
+        return self.daily_timestamp.strftime('%b %d, %Y')
+    daily_timestamp = models.DateTimeField()
 
 class Coin(models.Model):
     def __str__(self):
@@ -19,13 +23,10 @@ class Coin(models.Model):
     star = models.IntegerField(default=-1)
     investment_memo = models.TextField()
     contract_address = models.CharField(max_length=1024)
+    largested_timestamp = models.ForeignKey(TimeStamp)
+    number_of_timestamps = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-class TimeStamp(models.Model):
-    def __str__(self):
-        return self.daily_timestamp.strftime('%b %d, %Y')
-    daily_timestamp = models.DateTimeField()
 
 class Historical(models.Model):
     def __str__(self):
@@ -65,7 +66,7 @@ class Account(models.Model):
 
 class TokenTransaction(models.Model):
     def __str__(self):
-        return self.token_name.coin_name + ": from " + self.from_account.account_address + " to " + self.to_account.account_address + " " + str(self.quantity)
+        return self.timestamp.daily_timestamp.strftime('%b %d, %Y') + ": from " + self.from_account.account_address + " to " + self.to_account.account_address + " " + str(self.quantity)
     token_name = models.ForeignKey(Coin)
     tx_hash = models.CharField(max_length=1024)
     timestamp = models.ForeignKey(TimeStamp)

@@ -121,20 +121,65 @@ def bad_ico(request):
     request.GET['ico'] = 'bad'
     return index(request)
 
+def beatifiy_a_number(number):
+    return "{:,}".format(number)
+
 def detail(request):
-    id = request.GET.get('id', 'None')
-    coin_name = Coin.objects.get(id=id).coin_name
-
-    slider_timestamps = TimeStamp.objects.all()
     if request.method == "POST":
+        id = request.GET.get('id', 'None').split("/")[0]
         slider_value = request.POST.get('slider_value')
+        print(id)
+        print(slider_value)
         slider_time_stamp = int(slider_value)
-        timestamp = TimeStamp.objects.get(id=slider_time_stamp)
     else:
-        slider_time_stamp = len(slider_timestamps)
-        timestamp = TimeStamp.objects.latest('daily_timestamp')
+        id = request.GET.get('id', 'None')
 
-    return render(request, 'detail.html',{'token_title':coin_name,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps)})
+    coin = Coin.objects.get(id=id)
+
+
+    timestamps = [coin.largested_timestamp]
+    for x in range(1,int(coin.number_of_timestamps)):
+        tmp_timestamp = coin.largested_timestamp.daily_timestamp + datetime.timedelta(days=x)
+        tmp_timestamp_obj = TimeStamp.objects.get(daily_timestamp=tmp_timestamp)
+        timestamps.append(tmp_timestamp_obj)
+    timestamps.sort(key=lambda x: x.daily_timestamp)
+
+    if request.method == "GET":
+        slider_time_stamp = len(timestamps)
+
+    slider_time_stamp_obj = timestamps[slider_time_stamp-1]
+    timestamp_s = slider_time_stamp_obj.daily_timestamp.strftime('%Y-%b-%d')
+
+    transactions = TokenTransaction.objects.all().filter(token_name=coin,timestamp=slider_time_stamp_obj)
+
+    #build top_holder_balance_arr arr
+    top_limit = 50
+    current_account_balance_dict = dict()
+    top_holder_balance_arr = []
+
+    for transaction in transactions:
+        targeted_account = transaction.to_account
+        transaction_amount = transaction.quantity
+        if transaction.to_account not in current_account_balance_dict:
+            current_account_balance_dict[targeted_account] = transaction_amount
+        else:
+            current_account_balance_dict[targeted_account] += transaction_amount
+
+    top_token_holder_accounts = sorted(current_account_balance_dict, key=lambda k: current_account_balance_dict[k],reverse=True)[:top_limit]
+    rank = 1
+    for account in top_token_holder_accounts:
+        top_holder_balance_arr.append([rank,account,beatifiy_a_number(int(current_account_balance_dict[account]))])
+        rank += 1
+
+    #build sort_by_quantity_transactions
+    sort_by_quantity_transactions = transactions.order_by("-quantity")[:top_limit]
+    sort_by_quantity_transactions_arr = []
+    rank = 1
+    for transaction in sort_by_quantity_transactions:
+        sort_by_quantity_transactions_arr.append([rank,transaction.to_account,beatifiy_a_number(int(transaction.quantity)),("%.5f" % float(transaction.quantity / 5000000)) + "%"])
+        rank += 1
+
+    return render(request, 'detail.html',{'coin_id':coin.id,'token_title':coin.coin_name,"current_timestamp":slider_time_stamp,"max_timestamp":coin.number_of_timestamps,'timestamp_s':timestamp_s,'top_holder_balance_arr':top_holder_balance_arr,'sort_by_quantity_transactions_arr':sort_by_quantity_transactions_arr})
 
 #pre-fetch rank information for all the coins
 global_coin_rank_dict = dict()
