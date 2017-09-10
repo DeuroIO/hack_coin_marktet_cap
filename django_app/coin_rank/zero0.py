@@ -1,7 +1,7 @@
 import csv
 import datetime
-import locale
-locale.setlocale(locale.LC_ALL, 'en_US')
+#import locale
+#locale.setlocale(locale.LC_ALL, 'en_US')
 import collections
 
 def parse_time_to_hour(timestamp):
