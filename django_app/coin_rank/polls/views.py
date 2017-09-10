@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from .models import Coin,TimeStamp,Historical,Rank,Price_Change
+from .models import Coin,TimeStamp,Historical,Rank,Price_Change,Account,TokenTransaction
 from .parse_coinmarket_cap import  get_all_coins,get_historical_data_for_url
 from .helper import beatifiy_a_number,millify
 import datetime
 import numpy
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 import json
 from threading import Timer
 #!/usr/bin/env python
@@ -134,7 +134,7 @@ def detail(request):
     else:
         slider_time_stamp = len(slider_timestamps)
         timestamp = TimeStamp.objects.latest('daily_timestamp')
-    print(slider_time_stamp)
+
     return render(request, 'detail.html',{'token_title':coin_name,"current_timestamp":slider_time_stamp,"max_timestamp":len(slider_timestamps)})
 
 #pre-fetch rank information for all the coins
@@ -151,7 +151,7 @@ def populate_gobal_coin_rank_dict():
 
     coins = Coin.objects.all()
     timestamps = TimeStamp.objects.all().order_by('daily_timestamp')
-    
+
     counter = 1
     for coin in coins:
         print("{} : {}".format(counter,coin))
@@ -175,7 +175,6 @@ def populate_gobal_coin_rank_dict():
             global_coin_rank_dict[coin.id] = rank_array
         if len(cap_array) != 0:
             global_coin_cap_dict[coin.id] = cap_array
-        
 
 def detail_rank_for_coin(request):
     id = int(request.GET.get('id'))
@@ -283,3 +282,33 @@ def sync_up(request=None):
 
 interval = 3600 * 20   #interval (4hours)
 #populate_gobal_coin_rank_dict()
+
+from .html_helper import get_html_by_url
+#get all tokens from https://etherscan.io/tokens
+def get_tokens_from_view_tokens_page(request):
+    base_url = "https://etherscan.io/tokens"
+    soup = get_html_by_url(base_url)
+    h5s = soup.find_all("h5")
+    tokens = dict()
+    for h5 in h5s:
+        token_name = h5.text
+
+        #get token_contract address
+        half_url = h5.find("a")["href"]
+        whole_url = "https://etherscan.io{}".format(half_url)
+        token_soup = get_html_by_url(whole_url)
+        contract_tr = token_soup.find("tr",{"id":"ContentPlaceHolder1_trContract"})
+        contract_td = contract_tr.find_all('td')[1]
+        contract_address = contract_td.text
+
+        tokens[contract_address] = token_name
+        print(whole_url)
+
+
+    for contract_address in tokens:
+        token_name = tokens[contract_address]
+        # t = Coin(coin_name=token_name,contract_address=contract_address)
+        print(token_name)
+        # t.save()
+
+    return HttpResponse("succesfully get_tokens_from_view_tokens_page")
