@@ -213,15 +213,19 @@ def populate_gobal_coin_rank_dict():
                 cap_array.append([timestamp.daily_timestamp, h.circulating_cap])
             except:
                 pass
-        if counter == 5:
-            break
+        #if counter == 5:
+        #    break
         if len(rank_array) != 0:
             global_coin_rank_dict[coin.id] = rank_array
         if len(cap_array) != 0:
             global_coin_cap_dict[coin.id] = cap_array
 
 def detail_rank_for_coin(request):
-    id = int(request.GET.get('id'))
+    raw_id = request.GET.get('id')
+    if "slide_to" in raw_id:
+        id = int(raw_id.split("/")[0])
+    else:
+        id = int(raw_id)
     if id in global_coin_rank_dict:
         array = global_coin_rank_dict[id]
         return JsonResponse(array,safe=False)
@@ -229,7 +233,12 @@ def detail_rank_for_coin(request):
         return JsonResponse([],safe=False)
 
 def detail_cap_for_coin(request):
-    id = int(request.GET.get('id'))
+    raw_id = request.GET.get('id')
+    if "slide_to" in raw_id:
+        id = int(raw_id.split("/")[0])
+    else:
+        id = int(raw_id)
+    
     if id in global_coin_cap_dict:
         array = global_coin_cap_dict[id]
         return JsonResponse(array, safe=False)
@@ -325,7 +334,7 @@ def sync_up(request=None):
     return index(request)
 
 interval = 3600 * 20   #interval (4hours)
-#populate_gobal_coin_rank_dict()
+populate_gobal_coin_rank_dict()
 
 from .html_helper import get_html_by_url
 #get all tokens from https://etherscan.io/tokens
