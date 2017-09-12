@@ -63,6 +63,7 @@ class Account(models.Model):
         return  self.gussed_name + " " + self.account_address
     gussed_name = models.CharField(max_length=1024)
     account_address = models.CharField(max_length=1024)
+    account_memo = models.TextField(default="")
 
 class TokenTransaction(models.Model):
     def __str__(self):

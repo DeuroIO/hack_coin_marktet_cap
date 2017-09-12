@@ -65,6 +65,7 @@
                 <th>Address</th>
                 <th>Quantity</th>
                 <th>Percantage</th>
+                <th>Account Memo</th>
               </tr>
             </thead>
             {% for rank,account,balance,percentage in top_holder_balance_arr %}
@@ -74,6 +75,14 @@
                 <td>{{ account.account_address }}</td>
                 <td>{{ balance }}</td>
                 <td>{{ percentage }}</td>
+                <td>
+                  <form action="/save_memo/?account_id={{ account.account_address }}&id={{coin_id}}" method="post">
+        {% csrf_token %}
+                    <textarea name="memo" rows="3" cols="50">{{ account.account_memo }}</textarea>
+        <input type="submit" class="btn btn-primary" value="Save"/>
+      </form>
+
+                  </td>
             </tr>
           </tbody>
           {% endfor %}
@@ -89,8 +98,8 @@
               <th>Rank</th>
               <th>Address</th>
               <th>Quantity</th>
-              <th>Percantage</th>
-              <th>Memo</th>
+              <th>Percentage</th>
+              <th>Account Memo</th>
             </tr>
           </thead>
           {% for rank,address,quantity,percantage in sort_by_quantity_transactions_arr %}
@@ -100,9 +109,14 @@
               <td>{{ address.account_address }}</td>
               <td>{{ quantity }}</td>
               <td>{{ percantage }}</td>
-              <textarea rows="4" cols="50">
-At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.
-</textarea>
+              <td>
+                  <form action="/save_memo/?account_id={{ address.account_address }}&id={{coin_id}}" method="post">
+        {% csrf_token %}
+                    <textarea name="memo" rows="3" cols="50">{{ address.account_memo }}</textarea>
+        <input type="submit" class="btn btn-primary" value="Save"/>
+      </form>
+
+                  </td>
           </tr>
         </tbody>
         {% endfor %}

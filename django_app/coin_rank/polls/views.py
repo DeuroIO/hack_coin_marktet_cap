@@ -136,7 +136,6 @@ def detail(request):
 
     coin = Coin.objects.get(id=id)
 
-
     timestamps = [coin.largested_timestamp]
     for x in range(1,int(coin.number_of_timestamps)):
         tmp_timestamp = coin.largested_timestamp.daily_timestamp + datetime.timedelta(days=x)
@@ -246,8 +245,15 @@ def detail_cap_for_coin(request):
         return JsonResponse([],safe=False)
 
 def save_investment_memo(request):
-    in_coin = request.POST.get('id', 'None')
-    print(request)
+    account_address = request.GET.get('account_id','None')
+
+    #save the account_memo
+    account_obj = Account.objects.get(account_address=account_address)
+    account_obj.account_memo = request.POST.get('memo')
+    account_obj.save()
+
+    request.method = "GET"
+    return detail(request)
 
 def sync_up(request=None):
     coin_to_url = get_all_coins()
@@ -334,7 +340,7 @@ def sync_up(request=None):
     return index(request)
 
 interval = 3600 * 20   #interval (4hours)
-populate_gobal_coin_rank_dict()
+#populate_gobal_coin_rank_dict()
 
 from .html_helper import get_html_by_url
 #get all tokens from https://etherscan.io/tokens
