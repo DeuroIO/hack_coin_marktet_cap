@@ -88,6 +88,7 @@
               <th>Address</th>
               <th>Quantity</th>
               <th>Percantage</th>
+              <th>Memo</th>
             </tr>
           </thead>
           {% for rank,address,quantity,percantage in sort_by_quantity_transactions_arr %}
@@ -97,6 +98,9 @@
               <td>{{ address.account_address }}</td>
               <td>{{ quantity }}</td>
               <td>{{ percantage }}</td>
+              <textarea rows="4" cols="50">
+At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.
+</textarea>
           </tr>
         </tbody>
         {% endfor %}

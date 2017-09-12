@@ -23,7 +23,7 @@ class Coin(models.Model):
     star = models.IntegerField(default=-1)
     investment_memo = models.TextField()
     contract_address = models.CharField(max_length=1024)
-    largested_timestamp = models.ForeignKey(TimeStamp)
+    largested_timestamp = models.ForeignKey(TimeStamp,null=True)
     number_of_timestamps = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
