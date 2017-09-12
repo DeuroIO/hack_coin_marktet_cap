@@ -64,14 +64,16 @@
                 <th>Rank</th>
                 <th>Address</th>
                 <th>Quantity</th>
+                <th>Percantage</th>
               </tr>
             </thead>
-            {% for rank,account,balance in top_holder_balance_arr %}
+            {% for rank,account,balance,percentage in top_holder_balance_arr %}
             <tbody>
               <tr>
                 <th scope="row">{{ rank }}</th>
                 <td>{{ account.account_address }}</td>
                 <td>{{ balance }}</td>
+                <td>{{ percentage }}</td>
             </tr>
           </tbody>
           {% endfor %}

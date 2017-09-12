@@ -168,7 +168,7 @@ def detail(request):
     top_token_holder_accounts = sorted(current_account_balance_dict, key=lambda k: current_account_balance_dict[k],reverse=True)[:top_limit]
     rank = 1
     for account in top_token_holder_accounts:
-        top_holder_balance_arr.append([rank,account,beatifiy_a_number(int(current_account_balance_dict[account]))])
+        top_holder_balance_arr.append([rank,account,beatifiy_a_number(int(current_account_balance_dict[account])),("%.5f" % float(current_account_balance_dict[account] / 5000000)) + "%"])
         rank += 1
 
     #build sort_by_quantity_transactions
