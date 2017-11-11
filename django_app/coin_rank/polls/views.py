@@ -252,8 +252,7 @@ def save_investment_memo(request):
     account_obj.account_memo = request.POST.get('memo')
     account_obj.save()
 
-    request.method = "GET"
-    return detail(request)
+    return HttpResponse(json.dumps({'message': "succesfully"}))
 
 def sync_up(request=None):
     coin_to_url = get_all_coins()
@@ -340,7 +339,7 @@ def sync_up(request=None):
     return index(request)
 
 interval = 3600 * 20   #interval (4hours)
-#populate_gobal_coin_rank_dict()
+# populate_gobal_coin_rank_dict()
 
 from .html_helper import get_html_by_url
 #get all tokens from https://etherscan.io/tokens

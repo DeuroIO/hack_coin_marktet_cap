@@ -110,7 +110,7 @@
               <td>{{ quantity }}</td>
               <td>{{ percantage }}</td>
               <td>
-                  <form action="/save_memo/?account_id={{ address.account_address }}&id={{coin_id}}" method="post">
+                  <form action="/save_memo/?account_id={{ address.account_address }}&id={{coin_id}}" method="post" >
         {% csrf_token %}
                     <textarea name="memo" rows="3" cols="50">{{ address.account_memo }}</textarea>
         <input type="submit" class="btn btn-primary" value="Save"/>
